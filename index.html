@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<title>Future of async programming</title>
+	<link href="http://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700,700italic" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="node_modules/shower-ribbon/styles/screen-16x10.css">
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body class="shower list">
+	<header class="caption">
+		<h1>Будущее асинхронного программирования и ECMAScript</h1>
+		<p><a href="http://alexeyraspopov.github.io">Алексей Распопов</a>, <a href="http://datarobot.com">DataRobot</a>.</p>
+	</header>
+
+	<section class="slide" id="title">
+		<h2>Будущее асинхронного программирования</h2>
+		<p>Алексей Распопов</p>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/async-pain.png" class="cover w">
+	</section>
+
+	<section class="slide">
+		<h2><code>whoami</code></h2>
+
+		<ul>
+			<li>5 лет двигаю кнопки на <em class="primary-accent">3px</em> влево</li>
+			<li>Разработчик в <a href="http://datarobot.com">DataRobot</a></li>
+			<li>Храню личный говнокод на <a href="https://github.com/alexeyraspopov">ГитХабе</a></li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Побочные эффекты (side effects)</h2>
+		<p>Общение с другими сервисами/базами данных, события в окружении, прочее.</p>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/xkcd-1312.png" class="place" width="40%">
+	</section>
+
+	<section class="slide">
+		<h2>Асинхронное программирование</h2>
+
+		<p>Тип <span class="primary-accent">параллельных</span> вычислений, который подразумевает, что операция может быть выполнена кем-то на стороне, за пределами текущего вычислительного устройства.</p>
+		<p class="next">Можно выполнять несколько асинхронных операций <span class="secondary-accent">одновременно</span>.</p>
+		<p class="next">Результат работы нужно <em class="primary-accent">ждать</em>.</p>
+	</section>
+
+	<section class="slide">
+		<h2>Где в JavaScript асинхронное программирование?</h2>		
+
+		<ul>
+			<li>HTTP запросы</li>
+			<li class="next">Работа с файловой системой</li>
+			<li class="next">Таймеры</li>
+			<li class="next">События системы и пользователя</li>
+			<li class="next">Worker'ы</li>
+			<li class="next">...</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Как мы это делаем?</h2>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/callback-hell.png" class="cover w">
+	</section>
+
+	<section class="slide">
+		<img src="pictures/fox-stuck.jpg" class="cover w">
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">Promise</span>?</h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">Обещания</span> это хорошо?</h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Все еще <span class="secondary-accent">коллбеки</span>!</h2>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code>get('/resources', (resources) => {</code>
+			<code>  renderResources(resources);</code>
+			<code>});</code>
+		</pre>
+
+		<pre class="next">
+			<code>get('/resources')<mark>.then(</mark>(resources) => {</code>
+			<code>  renderResources(resources);</code>
+			<code>});</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">Новый</span> (другой) синтаксис</h2>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code>function main() {</code>
+			<code>  <span class="primary-accent">try</span> {</code>
+			<code>    let <mark>resources</mark> = getResources();</code>
+			<code>    render(resources);</code>
+			<code>  } <span class="primary-accent">catch</span> (<mark>error</mark>) {</code>
+			<code>  <mark class="comment">  // wow</mark></code>
+			<code>  }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code>function main() {</code>
+			<code>  getResources()</code>
+			<code>    <span class="primary-accent">.then</span>((<mark>resources</mark>) => {</code>
+			<code>      render(resources);</code>
+			<code>    })</code>
+			<code>    <span class="primary-accent">.catch</span>((<mark>error</mark>) => {</code>
+			<code>  <mark class="comment">    // wow</mark></code>
+			<code>    })</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/occam.jpg" class="cover w">
+	</section>
+
+	<section class="slide" id="angular">
+		<pre>
+			<code>function main() {</code>
+			<code>  getResources()</code>
+			<code>    <span class="primary-accent">.then</span>((<mark>resources</mark>) => {</code>
+			<code>      render(resources);</code>
+			<code>    })</code>
+			<code>    <span class="primary-accent">.catch</span>((<mark>error</mark>) => {</code>
+			<code>  <mark class="comment">    // wow</mark></code>
+			<code>    })</code>
+			<code>    <mark>.finally</mark>(() => {</code>
+			<code>  <mark class="comment">    // hell yeah</mark></code>
+			<code>    })</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">Angular</span>, что ты делаешь, <em class="secondary-accent">ахаха</em>, прекрати!</h2>
+	</section>
+
+	<section class="slide">
+		<h2><span class="primary-accent">Анти</span>паттерны и сложности</h2>
+
+		<ul>
+			<li>Размытие <span class="primary-accent">сложности</span> по модулю</li>
+			<li>Все еще есть задачи в которых <em class="secondary-accent">приходится</em> писать вложенные промисы</li>
+			<li>Сколько раз вы гуглили статьи по вопросам использования промисов?</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Хорошие практики</h2>
+
+		<ul>
+			<li>Переносимость кода</li>
+			<li>Поддержка <code>return</code></li>
+			<li>Отсутствие вложенности в <span class="primary-accent">99%</span> случаев</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">ECMA<span class="primary-accent">Script</span> 20<span class="secondary-accent">XX</span></h2>
+	</section>
+
+	<section class="slide">
+		<h2>Статус <span class="primary-accent">спецификаций</span></h2>
+		<img src="pictures/ecma262.png" width="100%">
+	</section>
+
+	<section class="slide">
+		<h2 class="shout code">
+			<code><span class="primary-accent">async</span>/<span class="secondary-accent">await</span></code>
+		</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Асинхронные функции</h2>
+
+		<ul>
+			<li>Есть в других языках (C#, Python 3.5)</li>
+			<li>Поддерживает стандартные операторы языка</li>
+			<li>Композиция все еще работает</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code>function main() {</code>
+			<code>  <span class="primary-accent">try</span> {</code>
+			<code>    let <mark>resources</mark> = getResources();</code>
+			<code>    render(resources);</code>
+			<code>  } <span class="primary-accent">catch</span> (<mark>error</mark>) {</code>
+			<code>  <mark class="comment">  // wow</mark></code>
+			<code>  }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code><mark class="important">async</mark> function main() {</code>
+			<code>  <span class="primary-accent">try</span> {</code>
+			<code>    let <mark>resources</mark> = <mark class="important">await</mark> getResources();</code>
+			<code>    render(resources);</code>
+			<code>  } <span class="primary-accent">catch</span> (<mark>error</mark>) {</code>
+			<code>  <mark class="comment">  // wow</mark></code>
+			<code>  }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code><mark>async</mark> function a() {</code>
+			<code>  let status;</code>
+			<code>  <span class="primary-accent">do</span> {</code>
+			<code>    status = <mark>await</mark> get('/status');</code>
+			<code>  <mark class="comment">  // ...</mark></code>
+			<code>  } <span class="primary-accent">while</span> (status !== 'COMPLETED');</code>
+			<code>  <mark>return</mark> result;</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout">Как? <em class="primary-accent">Хочу</em> прямо сейчас!</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Генераторы и итераторы</h2>
+
+		<pre>
+			<code><span class="primary-accent">function*</span> numbers() {</code>
+			<code>  <span class="secondary-accent">yield</span> 1;</code>
+			<code>  <span class="secondary-accent">yield</span> 2;</code>
+			<code>  <span class="secondary-accent">return</span> 3;</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code><span class="secondary-accent">const</span> iterator = numbers();</code>
+			<code>iterator<mark>.next()</mark>; <mark class="comment">// 1</mark></code>
+			<code>iterator.next(); <mark class="comment">// 2</mark></code>
+			<code>iterator.next(); <mark class="comment">// 3</mark></code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Корутины</h2>
+
+		<pre>
+			<code>co(<mark>function*</mark>() {</code>
+			<code>  var str = <mark>yield</mark> read(‘secret-passwords.txt’);</code>
+			<code>  str = str.replace(‘qwerty’, ‘123456’);</code>
+			<code>  <mark>yield</mark> write(‘new-passwords.txt’, str);</code>
+			<code>});</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout code">
+			<code>npm install <span class="primary-accent">co</span></code>
+		</h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout code">
+			<code><span class="primary-accent">browserify</span> code.js > bundle.js</code>
+		</h2>
+	</section>
+
+	<section class="slide">
+		<h2>Async/await уже сегодня</h2>
+
+		<pre>
+			<code>const getResources = <mark class="important">co.wrap</mark>(function* <mark>(name)</mark> {</code>
+			<code>  <span class="primary-accent">try</span> {</code>
+			<code>    <span class="secondary-accent">const</span> data = <span class="secondary-accent">yield</span> fetch(`/resources/${name}`);</code>
+			<code>  <mark class="comment">  // ...</mark></code>
+			<code>    <span class="secondary-accent">return</span> result;</code>
+			<code>  } <span class="primary-accent">catch</span> (error) {</code>
+			<code>  <mark class="comment">  // wow</mark></code>
+			<code>  }</code>
+			<code>});</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/no-excuses.gif" class="cover w">
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">Async</span>/await и <span class="secondary-accent">коллекции</span></h2>
+	</section>
+
+	<section class="slide">
+		<h2>Еще больше интерфейсов</h2>
+
+		<pre>
+			<code>[1, 2, 3, 4]</code>
+			<code>  .map(n => n * 3)</code>
+			<code>  .filter(n => n < 10)</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Что не так?</h2>
+
+		<ul>
+			<li>Жрущие память промежуточные результаты</li>
+			<li>Еще один интерфейс</li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Можно использовать итератор</h2>
+
+		<pre>
+			<code><span class="primary-accent">function*</span> getNames(users) {</code>
+			<code>  <span class="secondary-accent">for</span> (let user <span class="secondary-accent">of</span> users)</code>
+			<code>    <mark>yield</mark> user.name;</code>
+			<code>}</code>
+		</pre>
+		<pre>
+			<code><span class="primary-accent">function*</span> isAdult(users) {</code>
+			<code>  <span class="secondary-accent">for</span> (let user <span class="secondary-accent">of</span> users)</code>
+			<code>    if (user.age > 18) <mark>yield</mark> user;</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Композиция работает</h2>
+
+		<pre>
+			<code><span class="secondary-accent">for</span> (let user <span class="secondary-accent">of</span> getNames(isAdult(users))) {</code>
+			<code>  render(user);</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout"><span class="primary-accent">События</span> &mdash; асинхронная <span class="secondary-accent">коллекция</span></h2>
+	</section>
+
+	<section class="slide">
+		<h2 class="shout code"><code><span class="primary-accent">async</span> iteraton</code></h2>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code><span class="primary-accent"><mark>async</mark> function*</span> getCompanies() {</code>
+			<code>  <span class="secondary-accent">for</span> (let name <span class="secondary-accent">of</span> ['Alex', 'Ann', 'Vlad']) {</code>
+			<code>    const profile = <mark>await</mark> get(`/users/${name}`);</code>
+			<code>    <mark>yield</mark> profile.company;</code>
+			<code>  }</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<pre>
+			<code><mark><span class="secondary-accent">for</span> <span class="primary-accent">await</span></mark> (let company <span class="secondary-accent">of</span> getCompanies()) {</code>
+			<code>  console.log(company);</code>
+			<code>}</code>
+		</pre>
+	</section>
+
+	<section class="slide">
+		<h2>Ссылки</h2>
+
+		<ul>
+			<li><a href="https://github.com/tc39/ecma262">ECMAScript status, process, and documents</a></li>
+			<li><a href="https://github.com/tc39/ecmascript-asyncawait">Async/await for ECMAScript</a></li>
+			<li><a href="https://github.com/tc39/proposal-async-iteration">Asynchronous Iteration for ECMAScript</a></li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<h2>Что почитать</h2>
+
+		<ul>
+			<li><a href="https://medium.com/@tjholowaychuk/callbacks-vs-coroutines-174f1fe66127">TJ Holowaychuk: Callbacks vs Coroutines</a></li>
+			<li><a href="https://jakearchibald.com/2014/es7-async-functions/">Jake Archibald: ES7 Async Functions</a></li>
+			<li><a href="http://www.2ality.com/2015/11/tc39-process.html">Dr. Axel Rauschmayer: What’s in ECMAScript 2016 (ES7)?</a></li>
+			<li><a href="http://www.2ality.com/2015/03/es6-generators.html">Dr. Axel Rauschmayer: ES6 generators in depth</a></li>
+		</ul>
+	</section>
+
+	<section class="slide">
+		<img src="pictures/thanks.jpg" class="cover w">
+	</section>
+
+	<section class="slide">
+		<h2>Спасибо за внимание!</h2>
+
+		<ul>
+			<li><a href="https://twitter.com/alexeyraspopov">twitter.com/<strong>alexeyraspopov</strong></a></li>
+			<li><a href="https://github.com/alexeyraspopov">github.com/<strong>alexeyraspopov</strong></a></li>
+		</ul>
+
+		<p>Ссылка на эти слайды: <br><a href="http://alexeyraspopov.github.io/es-async-future">alexeyraspopov.github.io/es-async-future</a></p>
+	</section>
+
+	<footer class="badge">
+		<a href="https://github.com/shower/shower">Powered by Shower</a>
+	</footer>
+
+	<script src="node_modules/shower-core/shower.min.js"></script>
+</body>
+</html>
